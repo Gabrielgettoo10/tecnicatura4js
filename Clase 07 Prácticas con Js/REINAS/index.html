@@ -6,13 +6,16 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Solución del problema de las N Reinas</h2>
-  <p>Tablero con <strong>N = 8</strong> reinas colocadas sin atacarse.</p>
-  <div id="tablero"></div>
-  <p><strong>Posiciones de las reinas:</strong></p>
-  <pre id="arreglo"></pre>
-
+  <div class="contenedor">
+    <h1>Problema de las N Reinas</h1>
+    <p>Ingrese un número N (mínimo 8):</p>
+    <input type="number" id="nValue" min="8" value="8">
+    <button onclick="resolverNReinas()">Resolver</button>
+    <div id="resultado"></div>
+    <div id="tablero" class="tablero"></div>
+  </div>
   <script src="reinas.js"></script>
 </body>
 </html>
+
 

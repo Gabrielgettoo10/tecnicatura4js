@@ -1,83 +1,56 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const N = 8; // Tamaño del tablero NxN (mínimo 8)
-    const tablero = []; // Matriz para representar visualmente el tablero
-    const posiciones = new Array(N).fill(-1); // Guarda la columna de cada reina por fila
+function resolverNReinas() {
+  const n = parseInt(document.getElementById('nValue').value);
+  const tablero = Array.from({ length: n }, () => Array(n).fill(0));
+  const resultado = document.getElementById('resultado');
+  const divTablero = document.getElementById('tablero');
   
-    // Crear un tablero vacío (llenamos con strings vacíos)
-    for (let i = 0; i < N; i++) {
-      tablero[i] = new Array(N).fill('');
+  resultado.textContent = '';
+  divTablero.innerHTML = '';
+
+  function esSeguro(fila, col) {
+    for (let i = 0; i < fila; i++) {
+      if (tablero[i][col]) return false;
     }
-  
-    // Verifica si se puede colocar una reina en esa fila y columna
-    function esSeguro(fila, col) {
-      for (let i = 0; i < fila; i++) {
-        // Verifica si hay conflicto en columna o diagonales
-        if (
-          posiciones[i] === col ||                     // Misma columna
-          posiciones[i] - i === col - fila ||          // Misma diagonal \
-          posiciones[i] + i === col + fila             // Misma diagonal /
-        ) {
-          return false; // No es seguro
-        }
+    for (let i = fila, j = col; i >= 0 && j >= 0; i--, j--) {
+      if (tablero[i][j]) return false;
+    }
+    for (let i = fila, j = col; i >= 0 && j < n; i--, j++) {
+      if (tablero[i][j]) return false;
+    }
+    return true;
+  }
+
+  function resolver(fila) {
+    if (fila === n) return true;
+    for (let col = 0; col < n; col++) {
+      if (esSeguro(fila, col)) {
+        tablero[fila][col] = 1;
+        if (resolver(fila + 1)) return true;
+        tablero[fila][col] = 0;
       }
-      return true; // Es seguro colocar la reina aquí
     }
-  
-    // Función recursiva que intenta colocar reinas fila por fila (usa backtracking)
-    function ponerReinas(fila) {
-      if (fila === N) return true; // Caso base: se colocaron todas las reinas
-  
-      // Recorremos cada columna de la fila actual
-      for (let col = 0; col < N; col++) {
-        if (esSeguro(fila, col)) {
-          posiciones[fila] = col;     // Guardamos la posición
-          tablero[fila][col] = '♛';   // Colocamos visualmente la reina
-  
-          // Llamamos recursivamente para la siguiente fila (backtrack)
-          if (ponerReinas(fila + 1)) return true;
-  
-          // Si no funcionó, retrocedemos y probamos otra opción (backtrack)
-          posiciones[fila] = -1;
-          tablero[fila][col] = '';
-        }
-      }
-  
-      return false; // No se pudo ubicar reina en esta fila (backtrack)
+    return false;
+  }
+
+  if (!resolver(0)) {
+    resultado.textContent = 'No se encontró solución.';
+    return;
+  }
+
+  // Mostrar tablero
+  divTablero.style.gridTemplateColumns = `repeat(${n}, 40px)`;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const celda = document.createElement('div');
+      celda.classList.add('celda');
+      celda.classList.add((i + j) % 2 === 0 ? 'blanca' : 'negra');
+      if (tablero[i][j] === 1) celda.textContent = '♛';
+      divTablero.appendChild(celda);
     }
-  
-    // Función que muestra el tablero en pantalla
-    function mostrar() {
-      const div = document.getElementById("tablero");
-      let html = "<table>";
-  
-      for (let i = 0; i < N; i++) {
-        html += "<tr>";
-        for (let j = 0; j < N; j++) {
-          if (tablero[i][j] === '♛') {
-            html += "<td class='reina'>♛</td>"; // Casilla con reina
-          } else {
-            html += "<td></td>"; // Casilla vacía
-          }
-        }
-        html += "</tr>";
-      }
-  
-      html += "</table>";
-      div.innerHTML = html;
-    }
-  
-    // Muestra el arreglo de posiciones en pantalla
-    function mostrarPosiciones() {
-      const pre = document.getElementById("arreglo");
-      pre.textContent = JSON.stringify(posiciones);
-    }
-  
-    // Ejecutamos el algoritmo
-    if (ponerReinas(0)) {
-      mostrar();           // Mostrar tablero con reinas
-      mostrarPosiciones(); // Mostrar posiciones como [0, 4, 7, 5, 2, 6, 1, 3]
-    } else {
-      alert("No se encontró solución.");
-    }
-  });
+  }
+
+  const indices = tablero.map(fila => fila.findIndex(val => val === 1));
+  resultado.textContent = `Índices de columnas por fila: [${indices.join(', ')}]`;
+}
+
   
