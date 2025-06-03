@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Torres de Hanoi</title>
+  <style>
+    body {
+      background: #f5f5f5;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .torre-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      height: 300px;
+      gap: 50px;
+    }
+    .torre {
+      position: relative;
+      width: 120px;
+      height: 100%;
+      background: #ddd;
+      border: 2px solid #bbb;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      padding-bottom: 10px;
+    }
+    .palo {
+      position: absolute;
+      bottom: 0;
+      width: 10px;
+      height: 250px;
+      background: #555;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .disco {
+      height: 20px;
+      margin: 2px 0;
+      background: steelblue;
+      border-radius: 5px;
+      transition: all 0.5s;
+    }
+    .info {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Torres de Hanoi Visual</h1>
+
+<div class="torre-container">
+  <div class="torre" id="A"><div class="palo"></div></div>
+  <div class="torre" id="B"><div class="palo"></div></div>
+  <div class="torre" id="C"><div class="palo"></div></div>
+</div>
+
+<div class="info">
+  Movimientos: <span id="contador">0</span>
+</div>
+
+<button onclick="iniciar()">Iniciar</button>
+
+<script>
+  const torres = {
+    A: document.getElementById("A"),
+    B: document.getElementById("B"),
+    C: document.getElementById("C")
+  };
+
+  const discos = [];
+  const totalDiscos = 4;
+  let movimientos = 0;
+  const contador = document.getElementById("contador");
+
+  function crearDiscos(n) {
+    torres.A.innerHTML = '<div class="palo"></div>';
+    torres.B.innerHTML = '<div class="palo"></div>';
+    torres.C.innerHTML = '<div class="palo"></div>';
+    discos.length = 0;
+    for (let i = n; i >= 1; i--) {
+      const disco = document.createElement("div");
+      disco.className = "disco";
+      disco.style.width = `${30 + i * 20}px`;
+      disco.dataset.valor = i;
+      discos.push(disco);
+      torres.A.appendChild(disco);
+    }
+    movimientos = 0;
+    contador.textContent = movimientos;
+  }
+
+  function moverDisco(origen, destino) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const torreOrigen = torres[origen];
+        const torreDestino = torres[destino];
+        const disco = torreOrigen.lastElementChild;
+        if (disco && disco.classList.contains("disco")) {
+          torreDestino.appendChild(disco);
+          movimientos++;
+          contador.textContent = movimientos;
+        }
+        resolve();
+      }, 600);
+    });
+  }
+
+  async function hanoi(n, origen, auxiliar, destino) {
+    if (n === 1) {
+      await moverDisco(origen, destino);
+    } else {
+      await hanoi(n - 1, origen, destino, auxiliar);
+      await moverDisco(origen, destino);
+      await hanoi(n - 1, auxiliar, origen, destino);
+    }
+  }
+
+  function iniciar() {
+    crearDiscos(totalDiscos);
+    setTimeout(() => {
+      hanoi(totalDiscos, "A", "B", "C");
+    }, 800);
+  }
+</script>
+
+</body>
+</html>
